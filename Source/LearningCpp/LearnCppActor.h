@@ -20,6 +20,12 @@ public:
 	
 	ALearnCppActor();
 
+	void PrintPrimedNumberTillFunction();
+
+	void PrintFibonacciTillFunction();
+
+	void PrintHierarchyFunction();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
