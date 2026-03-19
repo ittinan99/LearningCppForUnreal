@@ -42,7 +42,7 @@ void ALearnCppActor::PrintFibonacciTillFunction()
 	}
 }
 
-void ALearnCppActor::PrintHierarchyFunction()
+void ALearnCppActor::PrintHierarchyRecursiveFunction()
 {
     struct FActorHierIterator
     {
@@ -81,6 +81,78 @@ void ALearnCppActor::PrintHierarchyFunction()
 
     FActorHierIterator Hier;
     FActorHierIterator RootResult = Hier.GetNextDepth(this, 0);
+}
+
+void ALearnCppActor::PrintHierarchyFunction()
+{
+    struct FActorHierIterator
+    {
+        AActor* Actor = nullptr;
+        int32   Depth = INDEX_NONE;
+        int32   ChildIndex = 0;
+        
+		bool IsValid() const
+		{
+			return Actor != nullptr;
+		}
+        
+        TArray<AActor*> GetChildren() const
+        {
+            TArray<AActor*> OutChildren;
+            if (this->IsValid())
+            {
+                Actor->GetAttachedActors(OutChildren);
+            }
+            return OutChildren;
+        }
+
+        FActorHierIterator GetCurrentChild() const
+        {
+            TArray<AActor*> Children = GetChildren();
+            if (!Children.IsValidIndex(ChildIndex))
+            {
+                return FActorHierIterator{};
+            }
+
+            FActorHierIterator Next;
+            Next.Actor = Children[ChildIndex];
+            Next.Depth = Depth + 1;
+            Next.ChildIndex = 0;
+            return Next;
+        }
+        
+        bool HasMoreChildren() const
+        {
+            return GetChildren().IsValidIndex(ChildIndex);
+        }
+    };
+
+    UE_LOG(LogTemp, Log, TEXT("%s"), *this->GetActorNameOrLabel());
+
+    FActorHierIterator Root;
+    Root.Actor = this;
+    Root.Depth = 0;
+
+    TArray<FActorHierIterator> Stack;
+    Stack.Add(Root);
+    
+    while (Stack.Num() > 0)
+    {
+        FActorHierIterator& Current = Stack.Last();
+
+        if (!Current.HasMoreChildren())
+        {
+            Stack.Pop(EAllowShrinking::No);
+            continue;
+        }
+
+        FActorHierIterator Child = Current.GetCurrentChild();
+        Current.ChildIndex++;
+
+        UE_LOG(LogTemp, Log, TEXT("%*s%s"), Child.Depth * 2, TEXT(""), *Child.Actor->GetActorNameOrLabel());
+
+        Stack.Push(Child);
+    }
 }
 
 // Sets default values

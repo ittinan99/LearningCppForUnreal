@@ -24,6 +24,8 @@ public:
 
 	void PrintFibonacciTillFunction();
 
+	void PrintHierarchyRecursiveFunction();
+
 	void PrintHierarchyFunction();
 
 protected:
